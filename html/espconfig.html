@@ -1,0 +1,76 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <title>Wi-Fi Credentials</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+  <div class="topnav">
+    <h1>ESP Satel CA Wi-Fi &amp; MQTT Config</h1>
+  </div>
+  <div class="content">
+    <div class="card-grid">
+      <div class="card">
+        <form action="/" method="POST">
+                    
+			<div><strong>WiFi Configuration</strong></div>			
+            <table style="width: 100%">
+				<tr>
+					<td style="width: 79px; height: 26px;">
+			  			<label for="ssid">SSID:</label></td>
+					<td style="height: 26px">
+            			<input type="text" id ="ssid" name="ssid" style="width: 200px" value="wifiSSID"></td>
+				</tr>
+				<tr>
+					<td style="width: 79px">
+            			<label for="pass">Password:</label></td>
+					<td>
+            			<input type="password" id ="pass" name="pass" style="width: 200px" value="wifiPASS"></td>
+				</tr>
+				<tr>
+					<td style="width: 79px; height: 26px;">
+			            <label for="hostname">Host name:</label></td>
+					<td style="height: 26px">
+			            <input type="text" id ="hostname" name="hostname" value="wifiHOST" style="width: 200px"></td>
+				</tr>			
+			</table>
+			<br>
+	       	<div><strong>MQTT Server Configuration</strong></div>
+            <table style="width: 100%">
+				<tr>
+					<td style="width: 82px"><label for="mqttserver">Server:</label></td>
+					<td>
+					<input type="text" id ="mqttserver" name="mqttserver" style="width: 197px" value="mqttSERVER"></td>
+				</tr>
+				<tr>
+					<td style="width: 82px"><label for="mqttport">Port: </label></td>
+					<td>
+					<input type="number" id ="mqttport" name="mqttport" value="1883" style="width: 49px"></td>
+				</tr>
+				<tr>
+					<td style="width: 82px"><label for="mqttuser">User:</label></td>
+					<td>
+					<input type="text" id ="mqttuser" name="mqttuser" style="width: 111px" value="mqttUSER"></td>
+				</tr>
+				<tr>
+					<td style="width: 82px"><label for="mqttpass">Password:</label></td>
+					<td>
+					<input type="password" id ="mqttpass" name="mqttpass" value="mqttPASS"></td>
+				</tr>
+				<tr>
+					<td style="width: 82px">Status:</td>
+					<td>
+					not connected</td>
+				</tr>
+			</table>		
+            <br>
+            <input type ="submit" value ="Submit">
+          
+        </form>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
