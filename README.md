@@ -38,7 +38,7 @@ Meanig of Satel frame bits:
   **17**                            - zone2 activate bit, 
   **23**                            - alarm LED bit.
 
-HA discovery message is send every 3 under homeassistant/binary_sensor/satelca10/ mqtt topic and LED17-20 are set with following HA device class: problem, running, running, sound, which allows to dispal proper icon in HA by default.
+HA discovery message is send every 3 min. under homeassistant/binary_sensor/satelca10/ mqtt topic and LED17-20 are set with following HA device class: problem, running, running, sound, which allows to dispal proper icon in HA by default.
 
 
 ## Step 1 - build the adapter board to connect Satel to ESP (this is not so difficult as you think :) ) 
