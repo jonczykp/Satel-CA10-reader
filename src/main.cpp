@@ -80,7 +80,7 @@ SatelLed *SatelCA10[] = {
   new SatelLed(19,"Warrning", "problem"),
   new SatelLed(21,"Zone1", "running"),
   new SatelLed(17,"Zone2", "running"),
-  new SatelLed(13,"Alarm", "sound"),
+  new SatelLed(23,"Alarm", "sound"),
   new SatelLed()
 };
 
