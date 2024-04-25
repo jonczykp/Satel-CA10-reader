@@ -165,7 +165,8 @@ void setup() {
 
     if (!error) {
       indexHTMLPage = IndexHTMLPage(String(jsonBuffer["wifiAP"]), String(jsonBuffer["wifiPASS"]), String(jsonBuffer["wifiHOSTNAME"]), 
-                                    String(jsonBuffer["mqttSERVER"]), jsonBuffer["mqttPORT"], String(jsonBuffer["mqttUSER"]), String(jsonBuffer["mqttPASS"]) );
+                                    String(jsonBuffer["mqttSERVER"]), jsonBuffer["mqttPORT"], 
+                                    String(jsonBuffer["mqttUSER"]), String(jsonBuffer["mqttPASS"]));
 
       Serial.println("Trying to connect to WIFI network: " + String(jsonBuffer["wifiAP"]));
       //try to connect
