@@ -279,7 +279,7 @@ void setup() {
 
 void loop()
 {
-  while (data_ready != true)                        //wait for data to be prepared by innerupt routine
+  while (data_ready != true)                        //wait for data to be prepared by IRAM_ATTR routine
     delay(1);
 
   bool new_data_flag = false;                       // Flag if the message changed from the previous one
