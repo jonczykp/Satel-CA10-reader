@@ -25,10 +25,11 @@ PubSubClient mqttClient(espClient);
 
 #define INITWIFINAME "SATELCA_WIFI"
 
-String mqttBroker, mqttUser, mqttPassword;
 
 const String mqttTopic = "satel/ca10/";
-const String mqttConfTopic = "homeassistant/binary_sensor/satelca10/";
+const String mqttConfTopic = "homeassistant/binary_sensor/satelca10T/";
+
+JsonDocument jsonESPConfig;                         //WiFi and MQTT json coonfig 
 
 // Define the pins we're using on your ESP board
 #define DATA_PIN D5
@@ -45,8 +46,8 @@ volatile long long last_interrupt_time = 0;         // Previous interrupt's time
 volatile bool data_ready = false;                   // Flag for marking when receiving the message ended, complete and the data is ready for use
 volatile uint32_t bit_count = DATA_FRAME_SIZE + 10; // Counter for the number of bits received from the message
 
-bool prev_message[DATA_FRAME_SIZE];             // previous message
-bool cur_message[DATA_FRAME_SIZE];              // current message for processing, copy of data_result but not impacted when reading new data
+bool prev_message[DATA_FRAME_SIZE];                 // previous message
+bool cur_message[DATA_FRAME_SIZE];                  // current message for processing, copy of data_result but not impacted when reading new data
 
 class SatelLed{
   public:
@@ -126,11 +127,35 @@ void IRAM_ATTR clk_isr() {
 }
 
 
+void CheckAndConnectMQTT()
+// check MQTT server if disconnect and set HTML page content
+{
+    String mqttBroker = String(jsonESPConfig["mqttSERVER"]);
+    mqttClient.setServer(mqttBroker.c_str(), jsonESPConfig["mqttPORT"]);
+    
+    if (!mqttClient.connected()) {
+          Serial.println("Connecting MQTT broker!");
+          mqttClient.connect(mqttTopic.c_str() , String(jsonESPConfig["mqttUSER"]).c_str(), String(jsonESPConfig["mqttPASS"]).c_str());
+
+          if (mqttClient.connected()) {
+            Serial.println("You're connected to the MQTT broker!");
+            indexHTMLPage = IndexHTMLPage(String(jsonESPConfig["wifiAP"]), String(jsonESPConfig["wifiPASS"]), String(jsonESPConfig["wifiHOSTNAME"]), 
+                                    String(jsonESPConfig["mqttSERVER"]), jsonESPConfig["mqttPORT"], 
+                                    String(jsonESPConfig["mqttUSER"]), String(jsonESPConfig["mqttPASS"]), "connected, authenticated" );
+          }
+          else {
+            Serial.println("MQTT connection failed!");
+            indexHTMLPage = IndexHTMLPage(String(jsonESPConfig["wifiAP"]), String(jsonESPConfig["wifiPASS"]), String(jsonESPConfig["wifiHOSTNAME"]), 
+                                    String(jsonESPConfig["mqttSERVER"]), jsonESPConfig["mqttPORT"], 
+                                    String(jsonESPConfig["mqttUSER"]), String(jsonESPConfig["mqttPASS"]));
+          }
+    }
+}
+
+
 void SatelCA10DiscoveryConfig()
 {
-    if (!mqttClient.connected())
-          mqttClient.connect(mqttTopic.c_str() , mqttUser.c_str(), mqttPassword.c_str());
-    
+    CheckAndConnectMQTT();
     int n = sizeof(SatelCA10) / sizeof(SatelCA10[0]);
     for (int i = 0; i < n; i++) 
       if (SatelCA10[i]->FrameBit != -1)
@@ -139,7 +164,8 @@ void SatelCA10DiscoveryConfig()
 \"object_id\":\"Satel_"+ SatelCA10[i]->Name + "\",\"unique_id\":\"Satel_"+ SatelCA10[i]->Name + "\",\
 \"device\":{\"identifiers\":[\"satel_ca10\"],\"name\":\"Satel CA10\"}}";
         
-        mqttClient.publish ( (mqttConfTopic + SatelCA10[i]->Name +"/config").c_str(), message.c_str(), true);
+        if (mqttClient.connected())
+          mqttClient.publish ( (mqttConfTopic + SatelCA10[i]->Name +"/config").c_str(), message.c_str(), true);
       }
 }   
 
@@ -160,27 +186,26 @@ void setup() {
     String str = cfgFile.readString();
     cfgFile.close();
 
-    JsonDocument jsonBuffer;
-    DeserializationError error = deserializeJson(jsonBuffer, str);
+    DeserializationError error = deserializeJson(jsonESPConfig, str);
 
     if (!error) {
-      indexHTMLPage = IndexHTMLPage(String(jsonBuffer["wifiAP"]), String(jsonBuffer["wifiPASS"]), String(jsonBuffer["wifiHOSTNAME"]), 
-                                    String(jsonBuffer["mqttSERVER"]), jsonBuffer["mqttPORT"], 
-                                    String(jsonBuffer["mqttUSER"]), String(jsonBuffer["mqttPASS"]));
+      indexHTMLPage = IndexHTMLPage(String(jsonESPConfig["wifiAP"]), String(jsonESPConfig["wifiPASS"]), String(jsonESPConfig["wifiHOSTNAME"]), 
+                                    String(jsonESPConfig["mqttSERVER"]), jsonESPConfig["mqttPORT"], 
+                                    String(jsonESPConfig["mqttUSER"]), String(jsonESPConfig["mqttPASS"]));
 
-      Serial.println("Trying to connect to WIFI network: " + String(jsonBuffer["wifiAP"]));
+      Serial.println("Trying to connect to WIFI network: " + String(jsonESPConfig["wifiAP"]));
       //try to connect
-      WiFi.begin(String(jsonBuffer["wifiAP"]), String(jsonBuffer["wifiPASS"]));
-      WiFi.setHostname(String(jsonBuffer["wifiHOSTNAME"]).c_str());
+      WiFi.begin(String(jsonESPConfig["wifiAP"]), String(jsonESPConfig["wifiPASS"]));
+      WiFi.setHostname(String(jsonESPConfig["wifiHOSTNAME"]).c_str());
       
-      int r = 0, timeout = ( String(jsonBuffer["wifiAP"]) == INITWIFINAME? 10 : 150 ); //150 for power cut t restart WiFI router
+      int r = 0, timeout = ( String(jsonESPConfig["wifiAP"]) == INITWIFINAME? 10 : 150 ); //150 for power cut t restart WiFI router
       
       while ((WiFi.status() != WL_CONNECTED) && (r++ < timeout )) {
         Serial.print(".");     // failed, retry
         delay(1000);
       }
       if (WiFi.status() != WL_CONNECTED){
-        Serial.println("\nYou cannot connect to WiFi network: " + String(jsonBuffer["wifiAP"]) + ", establishing WIFI AP (" + INITWIFINAME  + ") to configure the network");
+        Serial.println("\nYou cannot connect to WiFi network: " + String(jsonESPConfig["wifiAP"]) + ", establishing WIFI AP (" + INITWIFINAME  + ") to configure the network");
         
         WiFi.mode(WIFI_AP_STA);
         WiFi.softAP(INITWIFINAME);
@@ -199,34 +224,19 @@ void setup() {
 
         Serial.println("\nCLK pin: " + String(CLK_PIN) + ", DATA pin: " + String(DATA_PIN));
         
-        mqttBroker = String(jsonBuffer["mqttSERVER"]);
-        mqttUser = String(jsonBuffer["mqttUSER"]);
-        mqttPassword =String(jsonBuffer["mqttPASS"]);
+         
+        //CheckAndConnectMQTT();
 
-        mqttClient.setServer(mqttBroker.c_str(), jsonBuffer["mqttPORT"]);
-        //mqttClient.setServer(mqttBroker, mqttPort);
 
-        mqttClient.connect(mqttTopic.c_str(), mqttUser.c_str(), mqttPassword.c_str() );
-        if (!mqttClient.connected()){
-          Serial.println("MQTT connection failed!");
-          Serial.println(mqttClient.state());
-        }
-        else {
-          Serial.println("You're connected to the MQTT broker!");
-          indexHTMLPage = IndexHTMLPage(String(jsonBuffer["wifiAP"]), String(jsonBuffer["wifiPASS"]), String(jsonBuffer["wifiHOSTNAME"]), 
-                                    String(jsonBuffer["mqttSERVER"]), jsonBuffer["mqttPORT"], String(jsonBuffer["mqttUSER"]), String(jsonBuffer["mqttPASS"]), "connected, authenticated" );
 
-          // Set the DATA and CLK pins as inputs
-          pinMode(DATA_PIN, INPUT);
-          pinMode(CLK_PIN, INPUT);
+        SatelCA10DiscoveryConfig();
 
-          SatelCA10DiscoveryConfig();
+        // Set the DATA and CLK pins as inputs
+        pinMode(DATA_PIN, INPUT);
+        pinMode(CLK_PIN, INPUT);
 
-          // Enable interrupts on the CLK pin
-          attachInterrupt(digitalPinToInterrupt(CLK_PIN), clk_isr, CHANGE);  
-          // end of successful setup      
-    
-        }
+        // Enable interrupts on the CLK pin
+        attachInterrupt(digitalPinToInterrupt(CLK_PIN), clk_isr, CHANGE);  
       }
 
       // Web Server Root URL
@@ -304,8 +314,7 @@ void loop()
     Serial.println(RawDataMessage + ", " + hex_string + ", bit: " + ChangesMessage);
     */
 
-    if (!mqttClient.connected())
-       mqttClient.connect(mqttTopic.c_str() , mqttUser.c_str(), mqttPassword.c_str());
+    CheckAndConnectMQTT();
 
     // Send the JSON string to the MQTT broker -- section commented for deplyment, uncomment if you need to evaluate bits fo new satel device or you want to look for new leds
     /*
@@ -317,25 +326,27 @@ void loop()
     int n = sizeof(SatelCA10) / sizeof(SatelCA10[0]);
     for (int i = 0; i < n; i++) 
       if (SatelCA10[i]->FrameBit != -1)
-        if  (prev_message[SatelCA10[i]->FrameBit] != cur_message[SatelCA10[i]->FrameBit]) 
-          mqttClient.publish( (mqttTopic + "LED" + String(i+1)).c_str(),  (cur_message[SatelCA10[i]->FrameBit] == true) ? "ON" : "OFF" );
+        if  (prev_message[SatelCA10[i]->FrameBit] != cur_message[SatelCA10[i]->FrameBit])
+          if (mqttClient.connected())
+            mqttClient.publish( (mqttTopic + "LED" + String(i+1)).c_str(),  (cur_message[SatelCA10[i]->FrameBit] == true) ? "ON" : "OFF" );
 
         
     for (int i = 0; i < DATA_FRAME_SIZE; i++) 
       prev_message[i] = cur_message[i];
   }
   
-  
   //refresh all sensors every 3 min, sometimes relay needs it, millis function is set to 0 after 49 days of running thus seconf condition
   unsigned long cur_time = millis();
   if ( (cur_time > state_refresh_time ? cur_time-state_refresh_time : state_refresh_time-cur_time) > 180000  ) {      
     int n = sizeof(SatelCA10) / sizeof(SatelCA10[0]);
 
-    for (int i = 0; i < n; i++) 
-      if (SatelCA10[i]->FrameBit != -1)
-        mqttClient.publish( (mqttTopic + "LED" + String(i+1)).c_str(),  (cur_message[SatelCA10[i]->FrameBit] == true) ? "ON" : "OFF" );
-    
     SatelCA10DiscoveryConfig();
+
+    if (mqttClient.connected())
+      for (int i = 0; i < n; i++) 
+        if (SatelCA10[i]->FrameBit != -1)
+          mqttClient.publish( (mqttTopic + "LED" + String(i+1)).c_str(),  (cur_message[SatelCA10[i]->FrameBit] == true) ? "ON" : "OFF" );
+    
     state_refresh_time = cur_time;
     
   }
