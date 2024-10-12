@@ -279,7 +279,7 @@ void setup() {
 
 void loop()
 {
-  while (data_ready != true)
+  while (data_ready != true)                        //wait for data from alram system
     delay(1);
 
   bool new_data_flag = false;                       // Flag if the message changed from the previous one
