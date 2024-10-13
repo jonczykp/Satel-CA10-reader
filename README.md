@@ -40,7 +40,6 @@ Meanig of Satel frame bits:
 
 HA discovery message is send every 3 min. under homeassistant/binary_sensor/satelca10/ mqtt topic and LED17-20 are set with following HA device class: problem, running, running, sound, which allows to dispal proper icon in HA by default.
 
-
 ## Step 1 - build the adapter board to connect Satel to ESP (this is not so difficult as you might think :) ) 
 Due to the 12V power supply of the Satel alarm unit, the CLK and DATA lines also use 12V signal. This 12V signal first have to be converted to 3.3V or 5V before connecting to ESP board. 
 Please use [Pololu 2595](https://www.pololu.com/product/2595) or anything similar. It accepts  18 V on the higher-voltage side.
