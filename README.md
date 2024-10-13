@@ -41,7 +41,7 @@ Meanig of Satel frame bits:
 HA discovery message is send every 3 min. under homeassistant/binary_sensor/satelca10/ mqtt topic and LED17-20 are set with following HA device class: problem, running, running, sound, which allows to dispal proper icon in HA by default.
 
 
-## Step 1 - build the adapter board to connect Satel to ESP (this is not so difficult as you think :) ) 
+## Step 1 - build the adapter board to connect Satel to ESP (this is not so difficult as you might think :) ) 
 Due to the 12V power supply of the Satel alarm unit, the CLK and DATA lines also use 12V signal. This 12V signal first have to be converted to 3.3V or 5V before connecting to ESP board. 
 Please use [Pololu 2595](https://www.pololu.com/product/2595) or anything similar. It accepts  18 V on the higher-voltage side.
 The **+KPD** has to be connected to its HV input, **CLK** and **DATA** to any of the inputs on the HV side of the module (H1-H4).
@@ -55,16 +55,16 @@ Additionally, I preferred to use 220V->5V [power step down module](https://pl.al
 ![Adapter board](html/finalboard.jpg)
 
 ## Step 2 - compile the source code and upload firmware to your ESP board
-Please use Visual Studio Code (VSC) and PlatfromIO add-in to compile the code and upload the firmware to your ESP. There is a lot of messages send to VSC terminal (via Serial.print command) during the run. You can trace all messages or use it for debug mode in case of any issues or when trying to find new sensors which were not find be me.
+Please use Visual Studio Code (VSC) and PlatfromIO add-in to compile the code and upload the firmware to your ESP. There is a lot of messages send to VSC terminal (via Serial.print command) during the run. You can trace all messages or use it for debug mode in case of any issues or when trying to find new sensors which were not find by me.
 
 ![VSC Console](html/VSCconsole.jpg)
 
 ## Step 3 - configure WiFi and MQTT
-Once firmware is uploaded and ESP is run, you need to connect to ESP WiFI default Access Point (SATEL_WIFI) to configure your WiFi network and your HA MQTT Server. Please see pictures bellow
+Once firmware is uploaded and ESP is run, you need to connect to ESP WiFi default Access Point (SATEL_WIFI) to configure your WiFi network and your HA MQTT Server. Please see pictures bellow
 
 ![Network Config](html/networkconfig.jpg)
 
-If you give wrong WiFi network parameters (SSID or password) then you will have to wait 150 sec. to enter ESP in AP mode. If WiFi network parameters are good ESP will start sending MQTT messages and you will be able to find SATLE CA10 in your HA devices (you might way max 3 min for device discovery).
+If you give wrong WiFi network parameters (SSID or password) then you will have to wait 150s to enter ESP in AP mode. If WiFi network parameters are good ESP will start sending MQTT messages and you will be able to find SATLE CA10 in your HA devices (you might way max 3 min for device discovery).
 
 ![HA devices](html/HAdevices.jpg)
 
@@ -78,6 +78,6 @@ I have gas sensor on LED7 and reed relay for garage door. In these case I had to
 
 
 ## My Summary
-Connecting all sensor for Satel alarm unit added a lot of functionality to my HA. Now I know the status of my garage door, I can send messages if they are open during the night,, I can switch off devices if no one is in the room for a longer time, etc.
+Connecting all sensor for Satel alarm unit added a lot of functionality to my HA. Now I know the status of my garage door, I can send messages if they are open during the night, I can switch off devices if no one is in the room for a longer time, etc.
 
-Have a fun.
+Have a fun!
