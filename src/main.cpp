@@ -87,7 +87,7 @@ SatelLed *SatelCA10[] = {
 
 unsigned long state_refresh_time = 1000000;
 
-// Define the interrupt service routine for the clock pin
+// Define the interrupt service routine for the clock pin change
 void IRAM_ATTR clk_isr() {
   
   interrupt_time = micros();
@@ -222,17 +222,18 @@ void setup() {
         Serial.print(WiFi.localIP().toString());
         Serial.println(String(", hostname: ") + String(WiFi.hostname()) );
 
+        //connect mqqt server and send HA discovery message
+        SatelCA10DiscoveryConfig();
+
         Serial.println("\nCLK pin: " + String(CLK_PIN) + ", DATA pin: " + String(DATA_PIN));
         
-               // Set the DATA and CLK pins as inputs
+        // Set the DATA and CLK pins as inputs
         pinMode(DATA_PIN, INPUT);
         pinMode(CLK_PIN, INPUT);
 
         // Enable interrupts on the CLK pin
         attachInterrupt(digitalPinToInterrupt(CLK_PIN), clk_isr, CHANGE);  
 
-        //connect mqqt server and send HA discovery message
-        SatelCA10DiscoveryConfig();
 
       }
 
