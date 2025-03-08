@@ -130,26 +130,26 @@ void IRAM_ATTR clk_isr() {
 void CheckAndConnectMQTT()
 // check MQTT server if disconnect and set HTML page content
 {
-    String mqttBroker = String(jsonESPConfig["mqttSERVER"]);
-    mqttClient.setServer(mqttBroker.c_str(), jsonESPConfig["mqttPORT"]);
-    
     if (!mqttClient.connected()) {
-          Serial.println("Connecting MQTT broker!");
-          mqttClient.connect(mqttTopic.c_str() , String(jsonESPConfig["mqttUSER"]).c_str(), String(jsonESPConfig["mqttPASS"]).c_str());
+      String mqttBroker = String(jsonESPConfig["mqttSERVER"]);
+      mqttClient.setServer(mqttBroker.c_str(), jsonESPConfig["mqttPORT"]);
+      Serial.println("Connecting MQTT broker!");
+      mqttClient.connect(mqttTopic.c_str() , String(jsonESPConfig["mqttUSER"]).c_str(), String(jsonESPConfig["mqttPASS"]).c_str());
 
-          if (mqttClient.connected()) {
-            Serial.println("You're connected to the MQTT broker!");
-            indexHTMLPage = IndexHTMLPage(String(jsonESPConfig["wifiAP"]), String(jsonESPConfig["wifiPASS"]), String(jsonESPConfig["wifiHOSTNAME"]), 
-                                    String(jsonESPConfig["mqttSERVER"]), jsonESPConfig["mqttPORT"], 
-                                    String(jsonESPConfig["mqttUSER"]), String(jsonESPConfig["mqttPASS"]), "connected, authenticated" );
-          }
-          else {
-            Serial.println("MQTT connection failed!");
-            indexHTMLPage = IndexHTMLPage(String(jsonESPConfig["wifiAP"]), String(jsonESPConfig["wifiPASS"]), String(jsonESPConfig["wifiHOSTNAME"]), 
-                                    String(jsonESPConfig["mqttSERVER"]), jsonESPConfig["mqttPORT"], 
-                                    String(jsonESPConfig["mqttUSER"]), String(jsonESPConfig["mqttPASS"]));
-          }
+      if (mqttClient.connected()) {
+        Serial.println("You're connected to the MQTT broker!");
+        indexHTMLPage = IndexHTMLPage(String(jsonESPConfig["wifiAP"]), String(jsonESPConfig["wifiPASS"]), String(jsonESPConfig["wifiHOSTNAME"]), 
+                                String(jsonESPConfig["mqttSERVER"]), jsonESPConfig["mqttPORT"], 
+                                String(jsonESPConfig["mqttUSER"]), String(jsonESPConfig["mqttPASS"]), "connected, authenticated" );
+      }
+      else {
+        Serial.println("MQTT connection failed!");
+        indexHTMLPage = IndexHTMLPage(String(jsonESPConfig["wifiAP"]), String(jsonESPConfig["wifiPASS"]), String(jsonESPConfig["wifiHOSTNAME"]), 
+                                String(jsonESPConfig["mqttSERVER"]), jsonESPConfig["mqttPORT"], 
+                                String(jsonESPConfig["mqttUSER"]), String(jsonESPConfig["mqttPASS"]));
+      }
     }
+    
 }
 
 
@@ -198,7 +198,7 @@ void setup() {
       WiFi.begin(String(jsonESPConfig["wifiAP"]), String(jsonESPConfig["wifiPASS"]));
       WiFi.setHostname(String(jsonESPConfig["wifiHOSTNAME"]).c_str());
       
-      int r = 0, timeout = ( String(jsonESPConfig["wifiAP"]) == INITWIFINAME? 10 : 150 ); //150 for power cut t restart WiFI router
+      int r = 0, timeout = ( String(jsonESPConfig["wifiAP"]) == INITWIFINAME? 10 : 150 ); //150sec in case of power outage it should be sufficent to restart WiFI router
       
       while ((WiFi.status() != WL_CONNECTED) && (r++ < timeout )) {
         Serial.print(".");     // failed, retry
@@ -233,8 +233,6 @@ void setup() {
 
         // Enable interrupts on the CLK pin
         attachInterrupt(digitalPinToInterrupt(CLK_PIN), clk_isr, CHANGE);  
-
-
       }
 
       // Web Server Root URL
@@ -333,7 +331,7 @@ void loop()
       prev_message[i] = cur_message[i];
   }
   
-  //refresh all sensors every 3 min, sometimes relay needs it, millis function is set to 0 after 49 days of running thus seconf condition
+  //refresh all sensors every 3 min, sometimes relay needs it, millis function is set to 0 after 49 days of running thus second condition
   unsigned long cur_time = millis();
   if ( (cur_time > state_refresh_time ? cur_time-state_refresh_time : state_refresh_time-cur_time) > 180000  ) {      
     int n = sizeof(SatelCA10) / sizeof(SatelCA10[0]);
