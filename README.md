@@ -3,13 +3,13 @@ This Visual Studio Code project includes firmware for an ESP 8266 board (not tes
 
 Main idea has been taken from [GSzabados project](https://github.com/GSzabados/SATEL_CA-6_to_MQTT) (GREAT thanks), after several apporaches with connecting over the CA10 printer serial port e.g. [project](https://github.com/voyo/satel2mqtt).
 
-Additionally comparing to Szabados code includes: 
+Additionally comparing to Szabados my code includes: 
 - ESP 8266 adjustments
 - WiFi/MQTT Server Connection Configuration with HTML page - you don't need to hard code the passwords, servers, etc.
 - HomeAssistant Device Discovery - SATEL CA 10 device appear immediately in your HA device list with all sensors inside, not needed to define anything in configuration.yaml
 - Mapping of Satel frame bits into HA binary sensor with default device class
 - sending only the changes not the whole frame every time (it reduce mqtt server overload and traffic)
-- Additional code to trace changed bit sent to central alarm unit (It can be useful to find more leds/sensors which were not find by me).
+- Additional code to trace changed bit sent to central alarm unit (It can be useful to find more leds/sensors which have been found by me).
 - More flexibility to extend frame e.g. for other Satal alarm system if the data frame might be longer than 32bits and is not encrypted. If there is a volunteer to check with other Satel central unit I can better explain.
 
 
@@ -54,7 +54,7 @@ Additionally, I preferred to use 220V->5V [power step down module](https://pl.al
 ![Adapter board](html/finalboard.jpg)
 
 ## Step 2 - compile the source code and upload firmware to your ESP board
-Please use Visual Studio Code (VSC) and PlatfromIO add-in to compile the code and upload the firmware to your ESP. There is a lot of messages send to VSC terminal (via Serial.print command) during the run. You can trace all messages or use it for debug mode in case of any issues or when trying to find new sensors which were not find by me.
+Please use Visual Studio Code (VSC) and PlatfromIO add-in to compile the code and upload the firmware to your ESP. There is a lot of messages send to VSC terminal (via Serial.print command) during the run. You can trace all messages or use it for debug mode in case of any issues or when trying to find new sensors which have been not found by me.
 
 ![VSC Console](html/VSCconsole.jpg)
 
