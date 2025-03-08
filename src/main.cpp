@@ -29,7 +29,7 @@ PubSubClient mqttClient(espClient);
 const String mqttTopic = "satel/ca10/";
 const String mqttConfTopic = "homeassistant/binary_sensor/satelca10T/";
 
-JsonDocument jsonESPConfig;                         //WiFi and MQTT json coonfig 
+JsonDocument jsonESPConfig;                         //WiFi and MQTT json config 
 
 // Define the pins we're using on your ESP board
 #define DATA_PIN D5
