@@ -148,8 +148,7 @@ void CheckAndConnectMQTT()
                                 String(jsonESPConfig["mqttSERVER"]), jsonESPConfig["mqttPORT"], 
                                 String(jsonESPConfig["mqttUSER"]), String(jsonESPConfig["mqttPASS"]));
       }
-    }
-    
+    } 
 }
 
 
