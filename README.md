@@ -31,7 +31,7 @@ This 32bits is decoded by the ESP and transmitted to MQTT broker under satel/ca1
 
 ![MQTT LED Tompic](html/mqtt-led.jpg)
 
-Meanig of Satel frame bits:
+Meanig of Satel frame's bits:
   **31, 29, 27, 25, 15, 13, 11, 9** - represent led 1 to 8 on manipulator, 
   **19**                            - malfunction led bit, 
   **21**                            - zone1 activate bit, 
